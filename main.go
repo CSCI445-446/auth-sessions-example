@@ -18,7 +18,23 @@ func main() {
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
 
 	e.GET("/", func(c echo.Context) error {
-		return Render(c, http.StatusOK, templates.Login())
+		conn := database.Connect()
+		session, err := session.Get("session", c)
+		if err != nil {
+			return Render(c, http.StatusOK, templates.Login())
+		}
+
+		userID, ok := session.Values["userID"].(int)
+		if !ok {
+			return Render(c, http.StatusOK, templates.Login())
+		}
+
+		user := database.GetUserByID(conn, userID)
+		if user.Username == "" {
+			return Render(c, http.StatusOK, templates.Login())
+		}
+
+		return c.Redirect(http.StatusSeeOther, "/dashboard")
 	})
 
 	e.POST("/login", func(c echo.Context) error {
