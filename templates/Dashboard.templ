@@ -1,0 +1,19 @@
+package templates
+
+import (
+	"go-sessions/types"
+)
+
+templ Dashboard(user types.User) {
+	<div>
+		<h1>Dashboard</h1>
+		if user.Role == 2 {
+			<p>Welcome back administrator</p>
+		} else {
+			<p>Welcome back customer service rep</p>
+		}
+		<form action="/logout" method="post">
+			<button type="submit">Log out</button>
+		</form>
+	</div>
+}
